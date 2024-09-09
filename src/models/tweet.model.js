@@ -6,11 +6,17 @@ const { Schema } = mongoose;
 const tweetSchema = new Schema({
     text: {
         type: String,
-        required: true,
+        default: null,
+        required: function () {
+            return !this.image;
+        },
     },
     image: {
         type: String,
-        required: true,
+        default: null,
+        required: function () {
+            return !this.text;
+        },
     },
     author: {
         type: Schema.Types.ObjectId,

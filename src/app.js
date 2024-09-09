@@ -38,7 +38,7 @@ app.use('/api/uploadthing', createRouteHandler({
 
 // routing logic
 app.use('/api/user', userRoutes);
-app.use('/api/tweet', tweetRoutes)
+app.use('/api/tweets', tweetRoutes)
 
 
 

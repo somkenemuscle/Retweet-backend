@@ -8,6 +8,6 @@ import { signInUser, signUpUser } from '../controllers/user.controller.js';
 router.post("/signup", handleAsyncErr(signUpUser));
 
 // POST /login route
-router.post("/login", handleAsyncErr(signInUser));
+router.post("/signin", handleAsyncErr(signInUser));
 
 export default router;

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllTweets, getTweet, createTweet, deleteComment, deleteTweet, createComment, getAllComments } from '../controllers/tweet.controller.js';
+import { getAllTweets, getTweet, createTweet,getUserTweets, deleteComment, deleteTweet, createComment, getAllComments } from '../controllers/tweet.controller.js';
 import isLoggedin from '../utils/isLoggedin.js';
 import handleAsyncErr from '../utils/catchAsync.js';
 const router = express.Router();
@@ -12,16 +12,16 @@ router.get("/", getAllTweets);
 router.get("/:tweetId/comments", getAllComments);
 
 // // Route to get all tweets for a specific user
-// router.get('/:username/', handleAsyncErr(getUserTweets));
+router.get('/user/:username/', handleAsyncErr(getUserTweets));
 
 // GET a specific tweet by ID
 router.get("/:tweetId", handleAsyncErr(getTweet));
 
 // POST a new tweet
-router.post("/create", isLoggedin, handleAsyncErr(createTweet));
+router.post("/", isLoggedin, handleAsyncErr(createTweet));
 
 //Create a comment
-router.post("/:tweetId/comments/create", isLoggedin, handleAsyncErr(createComment));
+router.post("/:tweetId/comments", isLoggedin, handleAsyncErr(createComment));
 
 // Delete a specific tweet by ID
 router.delete("/:tweetId", isLoggedin, handleAsyncErr(deleteTweet));

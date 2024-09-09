@@ -10,13 +10,13 @@ export const getAllTweets = async (req, res, next) => {
     res.json(tweets);
 }
 
-// // GET all tweets for a specific user
-// export const getUserTweets = async (req, res) => {
-//     const username = req.params.username;
-//     // Find all tweets by a particular user by their username
-//     const tweets = await Tweet.find({ username }).sort({ createdAt: -1 }).populate('author').populate('comments');
-//     res.json(tweets);
-// }
+// GET all tweets for a specific user
+export const getUserTweets = async (req, res) => {
+    const username = req.params.username;
+    // Find all tweets by a particular user by their username
+    const tweets = await Tweet.find({ username }).sort({ createdAt: -1 }).populate('author').populate('comments');
+    res.json(tweets);
+}
 
 // GET a specific tweet by ID
 export const getTweet = async (req, res, next) => {

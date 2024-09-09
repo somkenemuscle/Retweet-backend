@@ -2,7 +2,6 @@ import { User } from '../models/user.model.js'
 import bcrypt from 'bcrypt';
 import generateToken from '../auth/auth.js'
 
-
 //Sign Up Controller Function
 export const signUpUser = async (req, res, next) => {
     const { username, email, password } = req.body;
@@ -56,7 +55,7 @@ export const signInUser = async (req, res, next) => {
         if (passwordMatch) {
             // Passwords match, generate JWT token
             const token = generateToken(user);
-            return res.status(200).json({ message: 'Sign In successful', token });
+            return res.status(200).json({ message: 'Sign In successful', token, user });
         } else {
             // Passwords don't match
             return res.status(401).json({ message: 'Invalid username or password' });
