@@ -6,11 +6,10 @@ export default function generateToken(user) {
     id: user._id,
     username: user.username,
     email: user.email
-    // Add other user information as needed
   };
 
   const options = {
-    expiresIn: '24h', // Set token expiration time
+    expiresIn: '24h', 
   };
 
   return jwt.sign(payload, secretKey, options);

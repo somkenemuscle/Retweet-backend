@@ -1,1 +1,3 @@
-export const secretKey = 'this_is_a_secret'; // Replace with your secret key
+import 'dotenv/config';
+
+export const secretKey = process.env.JWT_SECRET_KEY; // Replace with your secret key

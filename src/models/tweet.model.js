@@ -20,12 +20,25 @@ const tweetSchema = new Schema({
     },
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     comments: [{
         type: Schema.Types.ObjectId,
         ref: 'Comment'
     }],
 });
+
+//delete all tweet and comments
+tweetSchema.post('findOneAndDelete', async function (doc) {
+    if (doc) {
+        await Comment.deleteMany({
+            _id: {
+                $in: doc.comments
+            }
+        });
+    }
+});
+
 
 export const Tweet = mongoose.model('Tweet', tweetSchema);
