@@ -1,24 +1,21 @@
-import jwt from 'jsonwebtoken';
-import { secretKey } from '../auth/config.js';
+import passport from '../auth/passport.js';
 
-export default function isLoggedIn(req, res, next) {
-    // Extract token from cookies
-    const token = req.cookies.token;
-
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided' });
-    }
-
-    // Verify the token
-    jwt.verify(token, secretKey, (err, decoded) => {
+const isLoggedin = (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
         if (err) {
-            return res.status(401).json({ message: 'Invalid token' });
+            // Handle any errors that occurred during authentication
+            return res.status(500).json({ message: 'Internal server error' });
         }
+        if (!user) {
+            // If user is not authenticated, return 401 Unauthorized
+            return res.status(401).json({ message: 'Unauthorized, You dont have permission for this' });
+        }
+        // If authentication is successful, attach user information to request object
+        req.user = user;
 
-        // Attach decoded user information to request object
-        req.user = decoded;
-
-        // Proceed to the next middleware or route handler
+        // Call next middleware or route handler
         next();
-    });
-}
+    })(req, res, next); // Pass the next parameter
+};
+
+export default isLoggedin;

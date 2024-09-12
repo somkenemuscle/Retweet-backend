@@ -40,7 +40,7 @@ app.use('/api/', apiLimiter);
 
 // routing logic
 app.use('/api/auth', userRoutes);
-app.use('/api/tweets', tweetRoutes)
+app.use('/api/tweets', tweetRoutes);
 
 
 export default app;
