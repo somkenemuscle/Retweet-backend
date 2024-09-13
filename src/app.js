@@ -30,7 +30,7 @@ app.use(throttle);
 app.use(express.urlencoded({ extended: true }));
 
 // To parse incoming JSON in POST request body
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 // Use cookieParser middleware
 app.use(cookieParser());
@@ -59,7 +59,6 @@ app.use((err, req, res, next) => {
     // Send the error response to the client
     res.status(status).json({ message });
 });
-
 
 
 export default app;

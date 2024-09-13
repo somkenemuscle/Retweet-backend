@@ -103,7 +103,7 @@ export const signInUser = async (req, res) => {
         return res.status(200).json({ message: 'Sign In successful', username });
     } else {
         // Passwords don't match
-        return res.status(401).json({ message: 'Invalid password', code: 'INVALID_PASSWORD' });
+        return res.status(401).json({ message: 'Invalid username or password', code: 'INVALID_UERNAME_OR_PASSWORD' });
     }
 }
 
