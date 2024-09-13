@@ -107,7 +107,7 @@ export const signInUser = async (req, res, next) => {
             return res.status(200).json({ message: 'Sign In successful', username });
         } else {
             // Passwords don't match
-            return res.status(401).json({ message: 'Invalid password' });
+            return res.status(401).json({ message: 'Invalid password', code: 'INVALID_PASSWORD' });
         }
     } catch (error) {
         console.error('Error Occured during Login:', error);
@@ -133,13 +133,13 @@ export const logOutUser = async (req, res, next) => {
 
 
 //Refresh token controller function
-export const refreshToken = (req, res) => {
+export const refreshToken = (req, res, next) => {
     try {
         const refreshToken = req.cookies?.refreshToken;
 
         // Check if refreshToken is present in cookies
         if (!refreshToken) {
-            return res.status(401).json({ message: 'Refresh token not found, please log in again.' });
+            return res.status(401).json({ message: 'Refresh token not found, please log in again.', code: 'REFRESH_TOKEN_NOT_FOUND' });
         }
 
         // Verify the refresh token

@@ -1,8 +1,10 @@
-//function to handle try and catch errors
+// utils/handleAsyncErr.js
 export default function handleAsyncErr(fn) {
-    return function (req, res, next) {
-        fn(req, res, next).catch((err) => {
-            next(err)
-        })
-    }
+    return async (req, res, next) => {
+        try {
+            await fn(req, res, next);
+        } catch (err) {
+            next(err); // Pass any caught errors to the error-handling middleware
+        }
+    };
 }

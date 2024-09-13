@@ -8,7 +8,7 @@ const isLoggedin = (req, res, next) => {
         }
         if (!user) {
             // If user is not authenticated, return 401 Unauthorized
-            return res.status(401).json({ message: 'Unauthorized, You dont have permission for this' });
+            return res.status(401).json({ message: 'Unauthorized, You dont have permission for this', code: 'UNAUTHORIZED_ISLOGGEDIN_ACCESS' });
         }
         // If authentication is successful, attach user information to request object
         req.user = user;
