@@ -4,14 +4,14 @@ import { Tweet } from '../models/tweet.model.js';
 
 
 // GET all tweets
-export const getAllTweets = async (req, res, next) => {
+export const getAllTweets = async (req, res) => {
     // Fetch tweets and sort by createdAt field in descending order (newest first)
     const tweets = await Tweet.find().sort({ createdAt: -1 }).populate('author').populate('comments');
     res.json(tweets);
 }
 
 // GET all tweets for a specific user
-export const getUserTweets = async (req, res, next) => {
+export const getUserTweets = async (req, res) => {
     const username = req.params.username;
     // Find all tweets by a particular user by their username
     const tweets = await Tweet.find({ username }).sort({ createdAt: -1 }).populate('author').populate('comments');
@@ -19,13 +19,13 @@ export const getUserTweets = async (req, res, next) => {
 }
 
 // GET a specific tweet by ID
-export const getTweet = async (req, res, next) => {
+export const getTweet = async (req, res) => {
     const foundTweet = await Tweet.findById(req.params.tweetId).populate('author').populate('comments');
     res.json({ foundTweet });
 }
 
 //Get all comments for a specific tweet
-export const getAllComments = async (req, res, next) => {
+export const getAllComments = async (req, res) => {
     const foundTweet = await Tweet.findById(req.params.tweetId)
         .populate({
             path: 'comments',
@@ -41,7 +41,7 @@ export const getAllComments = async (req, res, next) => {
 
 
 // POST a new tweet
-export const createTweet = async (req, res, next) => {
+export const createTweet = async (req, res) => {
     const { text, image } = req.body;
     const newTweet = await Tweet.create({
         text,
@@ -54,7 +54,7 @@ export const createTweet = async (req, res, next) => {
 }
 
 //POST a comment
-export const createComment = async (req, res, next) => {
+export const createComment = async (req, res) => {
     const foundTweet = await Tweet.findById(req.params.tweetId).populate('comments').populate('author');
     if (!foundTweet) {
         return res.status(404).json({ message: "Tweet not found" });
@@ -70,7 +70,7 @@ export const createComment = async (req, res, next) => {
 };
 
 // Delete a specific tweet by ID
-export const deleteTweet = async (req, res, next) => {
+export const deleteTweet = async (req, res) => {
     const tweet = await Tweet.findById(req.params.tweetId);
     if (!tweet) {
         return res.status(404).json({ message: "Tweet not found" });
@@ -84,7 +84,7 @@ export const deleteTweet = async (req, res, next) => {
 }
 
 // Delete a specific comment by ID in campground and comment model
-export const deleteComment = async (req, res, next) => {
+export const deleteComment = async (req, res) => {
     const { tweetId, commentId } = req.params;
     //Find the comment by its id
     const foundComment = await Comment.findById(commentId);

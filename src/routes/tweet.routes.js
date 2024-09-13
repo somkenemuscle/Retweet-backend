@@ -6,10 +6,10 @@ const router = express.Router();
 
 
 // GET all tweets
-router.get("/", getAllTweets);
+router.get("/", handleAsyncErr(getAllTweets));
 
 // GET all comments for a specific tweets
-router.get("/:tweetId/comments", getAllComments);
+router.get("/:tweetId/comments", handleAsyncErr(getAllComments));
 
 // // Route to get all tweets for a specific user
 router.get('/user/:username/', handleAsyncErr(getUserTweets));
@@ -30,18 +30,6 @@ router.delete("/:tweetId", isLoggedin, handleAsyncErr(deleteTweet));
 router.delete("/:tweetId/comments/:commentId", isLoggedin, handleAsyncErr(deleteComment));
 
 
-// Error handling middleware
-router.use((err, req, res, next) => {
-    // Extract status and message from the error object, defaulting to 500 and a generic message
-    const status = err.status || 500;
-    const message = err.message || 'Something went wrong';
-
-    // Log the error details to the console for debugging
-    console.error(err);
-
-    // Send the error response to the client
-    res.status(status).json({ message });
-});
 
 
 
