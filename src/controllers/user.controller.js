@@ -5,6 +5,10 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import { refreshSecretKey } from '../auth/config.js';
 import { signUpSchema, signInSchema } from '../validators/authValidators.js';
+import axios from 'axios'
+
+//reCAPTCHA secret key environment variable
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 //Sign Up Controller Function
 export const signUpUser = async (req, res) => {
@@ -14,7 +18,22 @@ export const signUpUser = async (req, res) => {
         return res.status(400).json({ message: error.details[0].message });
     }
 
-    const { username, email, password } = req.body;
+    const { username, email, password, recaptchaToken } = req.body;
+
+    // Verify reCAPTCHA token
+    const recaptchaResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+        params: {
+            secret: RECAPTCHA_SECRET_KEY,
+            response: recaptchaToken
+        }
+    });
+
+    const { success } = recaptchaResponse.data;
+
+    if (!success) {
+        return res.status(400).json({ message: 'reCAPTCHA verification failed' });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({
         $or: [{ email }, { username }]
