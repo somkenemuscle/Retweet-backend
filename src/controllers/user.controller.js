@@ -65,14 +65,14 @@ export const signUpUser = async (req, res) => {
     // Set cookies
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         sameSite: 'None',
         maxAge: 15 * 60 * 1000 // 15 minutes
     });
@@ -110,14 +110,14 @@ export const signInUser = async (req, res) => {
         // Set cookies
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: true,
+            secure: false,
             sameSite: 'None',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: true,
+            secure: false,
             sameSite: 'None',
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
@@ -134,9 +134,9 @@ export const signInUser = async (req, res) => {
 //Log out Controller Function
 export const logOutUser = async (req, res) => {
 
-    res.cookie('refreshToken', '', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/' });
+    res.cookie('refreshToken', '', { httpOnly: true, secure: false, sameSite: 'None', maxAge: 0, path: '/' });
     // Clear the token cookie
-    res.cookie('accessToken', '', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/' });
+    res.cookie('accessToken', '', { httpOnly: true, secure: false, sameSite: 'None', maxAge: 0, path: '/' });
 
     res.status(200).json({ message: 'Logged out successfully' });
 }
@@ -164,7 +164,7 @@ export const refreshToken = (req, res) => {
         // Set the new access token in an HttpOnly cookie
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: true,
+            secure: false,
             sameSite: 'None',
             maxAge: 15 * 60 * 1000,
         });
