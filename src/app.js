@@ -23,6 +23,8 @@ app.use(morgan('dev'));
 // Use the CORS middleware
 app.use(corsMiddleware);
 
+app.options('*', corsMiddleware);
+
 // Apply general rate limiter before any API processing
 app.use(throttle);
 
