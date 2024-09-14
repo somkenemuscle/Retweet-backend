@@ -6,6 +6,9 @@ import jwt from 'jsonwebtoken';
 import { refreshSecretKey } from '../auth/config.js';
 import { signUpSchema, signInSchema } from '../validators/authValidators.js';
 import axios from 'axios'
+import dotenv from 'dotenv'
+// Load environment variables from .env file
+dotenv.config();
 
 //reCAPTCHA secret key environment variable
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
