@@ -7,6 +7,8 @@ import { refreshSecretKey } from '../auth/config.js';
 import { signUpSchema, signInSchema } from '../validators/authValidators.js';
 import axios from 'axios'
 import dotenv from 'dotenv'
+
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -92,7 +94,7 @@ export const signInUser = async (req, res) => {
         return res.status(400).json({ message: error.details[0].message });
     }
     const { username, password } = req.body;
-    // Check if the user exists by their email/username
+    // Check if the user exists by their username
     const user = await User.findOne({ username });
 
     if (!user) {
@@ -150,7 +152,7 @@ export const refreshToken = (req, res) => {
 
     // Check if refreshToken is present in cookies
     if (!refreshToken) {
-        return res.status(401).json({ message: 'Session timed out, Please log in again.', code: 'REFRESH_TOKEN_NOT_FOUND' });
+        return res.status(401).json({ message: 'You dont have the permission for this, Please log in.', code: 'REFRESH_TOKEN_NOT_FOUND' });
     }
 
     // Verify the refresh token
