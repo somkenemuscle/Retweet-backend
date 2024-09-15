@@ -67,7 +67,7 @@ export const signUpUser = async (req, res) => {
 
     // Set cookies
     res.cookie('refreshToken', refreshToken, {
-        domain: '.vercel.app',
+        domain: 'retweet-frontend.vercel.app',
         httpOnly: true,
         secure: true,
         sameSite: 'None',
@@ -76,7 +76,7 @@ export const signUpUser = async (req, res) => {
     });
 
     res.cookie('accessToken', accessToken, {
-        domain: '.vercel.app',
+        domain: 'retweet-frontend.vercel.app',
         httpOnly: true,
         secure: true,
         sameSite: 'None',
@@ -116,7 +116,7 @@ export const signInUser = async (req, res) => {
 
         // Set cookies
         res.cookie('refreshToken', refreshToken, {
-            domain: '.vercel.app',
+            domain: 'retweet-frontend.vercel.app',
             httpOnly: true,
             secure: true,
             sameSite: 'None',
@@ -146,11 +146,11 @@ export const signInUser = async (req, res) => {
 export const logOutUser = async (req, res) => {
 
     res.cookie('refreshToken', '', {
-        domain: '.vercel.app', httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/'
+        domain: 'retweet-frontend.vercel.app', httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/'
     });
     // Clear the token cookie
     res.cookie('accessToken', '', {
-        domain: '.vercel.app', httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/'
+        domain: 'retweet-frontend.vercel.app', httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/'
     });
 
     res.status(200).json({ message: 'Logged out successfully' });
@@ -178,7 +178,7 @@ export const refreshToken = (req, res) => {
 
         // Set the new access token in an HttpOnly cookie
         res.cookie('accessToken', accessToken, {
-            domain: '.vercel.app',
+            domain: 'retweet-frontend.vercel.app',
             httpOnly: true,
             secure: true,
             sameSite: 'None',
