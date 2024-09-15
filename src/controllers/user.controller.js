@@ -13,9 +13,6 @@ dotenv.config();
 //reCAPTCHA secret key environment variable
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
-// Determine if the environment is production
-const isProduction = process.env.NODE_ENV === 'production';
-
 
 //Sign Up Controller Function
 export const signUpUser = async (req, res) => {
@@ -69,14 +66,14 @@ export const signUpUser = async (req, res) => {
     // Set cookies
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: isProduction,
+        secure: true,
         sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: isProduction,
+        secure: true,
         sameSite: 'None',
         maxAge: 15 * 60 * 1000 // 15 minutes
     });
@@ -114,14 +111,14 @@ export const signInUser = async (req, res) => {
         // Set cookies
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: isProduction,
+            secure: true,
             sameSite: 'None',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: isProduction,
+            secure: true,
             sameSite: 'None',
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
@@ -138,9 +135,9 @@ export const signInUser = async (req, res) => {
 //Log out Controller Function
 export const logOutUser = async (req, res) => {
 
-    res.cookie('refreshToken', '', { httpOnly: true, secure: isProduction, sameSite: 'None', maxAge: 0, path: '/' });
+    res.cookie('refreshToken', '', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/' });
     // Clear the token cookie
-    res.cookie('accessToken', '', { httpOnly: true, secure: isProduction, sameSite: 'None', maxAge: 0, path: '/' });
+    res.cookie('accessToken', '', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/' });
 
     res.status(200).json({ message: 'Logged out successfully' });
 }
@@ -168,7 +165,7 @@ export const refreshToken = (req, res) => {
         // Set the new access token in an HttpOnly cookie
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: isProduction,
+            secure: true,
             sameSite: 'None',
             maxAge: 15 * 60 * 1000,
         });
