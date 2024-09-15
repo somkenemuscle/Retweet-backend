@@ -83,7 +83,6 @@ export const signUpUser = async (req, res) => {
     });
     res.status(201).json({ message: 'User registered successfully', username });
 
-
 }
 
 
@@ -125,11 +124,9 @@ export const signInUser = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'None',
-            maxAge: 15 * 60 * 1000, // 15 minutes
+            maxAge: 15 * 60 * 1000, // 15 minutes 
             path: '/'
         });
-
-        res.save();
 
         return res.status(200).json({ message: 'Sign In successful', username });
     } else {
