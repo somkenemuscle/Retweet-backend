@@ -129,6 +129,8 @@ export const signInUser = async (req, res) => {
             path: '/'
         });
 
+        res.save();
+
         return res.status(200).json({ message: 'Sign In successful', username });
     } else {
         // Passwords don't match
