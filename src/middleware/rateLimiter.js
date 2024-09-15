@@ -7,7 +7,7 @@ export const apiLimiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: {
         status: 429,
-        error: 'Too many sign-in attempts from this IP, please try again later.',
+        error: 'Too many requests, please try again later.',
     },
 });
 

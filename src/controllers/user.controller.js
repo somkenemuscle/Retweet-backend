@@ -13,6 +13,10 @@ dotenv.config();
 //reCAPTCHA secret key environment variable
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
+// Determine if the environment is production
+const isProduction = process.env.NODE_ENV === 'production';
+
+
 //Sign Up Controller Function
 export const signUpUser = async (req, res) => {
     // Validate the request body using Joi
@@ -65,14 +69,14 @@ export const signUpUser = async (req, res) => {
     // Set cookies
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: isProduction,
         sameSite: 'None',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: isProduction,
         sameSite: 'None',
         maxAge: 15 * 60 * 1000 // 15 minutes
     });
@@ -110,14 +114,14 @@ export const signInUser = async (req, res) => {
         // Set cookies
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: true,
+            secure: isProduction,
             sameSite: 'None',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: true,
+            secure: isProduction,
             sameSite: 'None',
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
@@ -134,9 +138,9 @@ export const signInUser = async (req, res) => {
 //Log out Controller Function
 export const logOutUser = async (req, res) => {
 
-    res.cookie('refreshToken', '', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/' });
+    res.cookie('refreshToken', '', { httpOnly: true, secure: isProduction, sameSite: 'None', maxAge: 0, path: '/' });
     // Clear the token cookie
-    res.cookie('accessToken', '', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/' });
+    res.cookie('accessToken', '', { httpOnly: true, secure: isProduction, sameSite: 'None', maxAge: 0, path: '/' });
 
     res.status(200).json({ message: 'Logged out successfully' });
 }
@@ -149,13 +153,13 @@ export const refreshToken = (req, res) => {
 
     // Check if refreshToken is present in cookies
     if (!refreshToken) {
-        return res.status(401).json({ message: 'Refresh token not found, please log in again.', code: 'REFRESH_TOKEN_NOT_FOUND' });
+        return res.status(401).json({ message: 'Session timed out, Please log in again.', code: 'REFRESH_TOKEN_NOT_FOUND' });
     }
 
     // Verify the refresh token
     jwt.verify(refreshToken, refreshSecretKey, (err, user) => {
         if (err) {
-            return res.status(403).json({ message: 'Invalid refresh token. Please log in again.' });
+            return res.status(403).json({ message: 'Session timed out. Please log in again.' });
         }
 
         // Generate a new access token
@@ -164,7 +168,7 @@ export const refreshToken = (req, res) => {
         // Set the new access token in an HttpOnly cookie
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: true,
+            secure: isProduction,
             sameSite: 'None',
             maxAge: 15 * 60 * 1000,
         });
