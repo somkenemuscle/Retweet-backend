@@ -5,15 +5,11 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import { refreshSecretKey } from '../auth/config.js';
 import { signUpSchema, signInSchema } from '../validators/authValidators.js';
+import { setRefreshToken, setAccessToken, removeAccessToken, removeRefreshToken } from '../utils/authCookies.js';
 import axios from 'axios'
 import dotenv from 'dotenv'
-
-
-// Load environment variables from .env file
 dotenv.config();
 
-//reCAPTCHA secret key environment variable
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 
 //Sign Up Controller Function
@@ -29,7 +25,7 @@ export const signUpUser = async (req, res) => {
     // Verify reCAPTCHA token
     const recaptchaResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
         params: {
-            secret: RECAPTCHA_SECRET_KEY,
+            secret: process.env.RECAPTCHA_SECRET_KEY,
             response: recaptchaToken
         }
     });
@@ -65,24 +61,12 @@ export const signUpUser = async (req, res) => {
     const accessToken = generateAccessToken(newUser);
     const refreshToken = generateRefreshToken(newUser);
 
-    // Set cookies
-    res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        path: '/'
-    });
+    //set cookies
+    setAccessToken(res, accessToken);
+    setRefreshToken(res, refreshToken);
 
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        maxAge: 15 * 60 * 1000, // 15 minutes
-        path: '/'
-    });
+    //Respond with success message
     res.status(201).json({ message: 'User registered successfully', username });
-
 
 }
 
@@ -96,11 +80,11 @@ export const signInUser = async (req, res) => {
         return res.status(400).json({ message: error.details[0].message });
     }
     const { username, password } = req.body;
+
     // Check if the user exists by their username
     const user = await User.findOne({ username });
 
     if (!user) {
-        // User not found
         return res.status(404).json({ message: 'User not found' });
     }
 
@@ -112,22 +96,9 @@ export const signInUser = async (req, res) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        // Set cookies
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            path: '/'
-        });
-
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 15 * 60 * 1000, // 15 minutes
-            path: '/'
-        });
+        //set cookies
+        setAccessToken(res, accessToken);
+        setRefreshToken(res, refreshToken);
 
         return res.status(200).json({ message: 'Sign In successful', username });
     } else {
@@ -140,15 +111,8 @@ export const signInUser = async (req, res) => {
 
 //Log out Controller Function
 export const logOutUser = async (req, res) => {
-
-    res.cookie('refreshToken', '', {
-        httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/'
-    });
-    // Clear the token cookie
-    res.cookie('accessToken', '', {
-        httpOnly: true, secure: true, sameSite: 'None', maxAge: 0, path: '/'
-    });
-
+    removeRefreshToken(res);
+    removeAccessToken(res);
     res.status(200).json({ message: 'Logged out successfully' });
 }
 
@@ -172,14 +136,7 @@ export const refreshToken = (req, res) => {
         // Generate a new access token
         const accessToken = generateAccessToken({ username: user.username, _id: user._id });
 
-        // Set the new access token in an HttpOnly cookie
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'None',
-            maxAge: 15 * 60 * 1000,
-            path: '/'
-        });
+        setAccessToken(res, accessToken);
 
         return res.status(200).json({ message: 'Access token refreshed successfully' });
     });
