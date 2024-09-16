@@ -27,7 +27,7 @@ const tweetSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Comment'
     }],
-});
+}, { timestamps: true });
 
 //delete all tweet and comments
 tweetSchema.post('findOneAndDelete', async function (doc) {
