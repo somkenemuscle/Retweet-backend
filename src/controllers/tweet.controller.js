@@ -5,9 +5,20 @@ import { Tweet } from '../models/tweet.model.js';
 
 // GET all tweets
 export const getAllTweets = async (req, res) => {
+
+    const page = parseInt(req.query.page) || 1;   // Current page, default to 1
+    const limit = parseInt(req.query.limit) || 10; // Number of tweets per request, default to 10
+    const skip = (page - 1) * limit;
+
     // Fetch tweets and sort by createdAt field in descending order (newest first)
-    const tweets = await Tweet.find().sort({ createdAt: -1 }).populate('author').populate('comments');
-    res.json(tweets);
+    const tweets = await Tweet.find().sort({ createdAt: -1 }).populate('author').populate('comments')
+        .sort({ createdAt: -1 })  // Sort by latest tweets
+        .skip(skip)               // Skip previous tweets based on the page
+        .limit(limit);            // Limit the number of tweets per request
+
+    // Send the tweets and total tweet count (optional for frontend logic)
+    const totalTweets = await Tweet.countDocuments();
+    res.status(200).json({ tweets, totalTweets });
 }
 
 // GET all tweets for a specific user
