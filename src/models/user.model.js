@@ -20,7 +20,12 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: [true, 'Password is required']
-    }
+    },
+    saves: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Tweet',
+        required: true
+    }]
 });
 
 export const User = mongoose.model('User', userSchema);

@@ -1,7 +1,7 @@
 import { Comment } from '../models/comment.model.js';
 import { Tweet } from '../models/tweet.model.js';
-
-
+import { User } from '../models/user.model.js';
+import mongoose from 'mongoose';
 
 // GET all tweets
 export const getAllTweets = async (req, res) => {
@@ -13,23 +13,104 @@ export const getAllTweets = async (req, res) => {
 // GET all tweets for a specific user
 export const getUserTweets = async (req, res) => {
     const username = req.params.username;
+    // Check if the user exists by their username
+    const user = await User.findOne({ username });
+
+    if (!user) {
+        return res.status(404).json({ message: 'Sorry, this user does not exist' });
+    }
     // Find all tweets by a particular user by their username
-    const tweets = await Tweet.find({ username }).sort({ createdAt: -1 }).populate('author').populate('comments');
+    const tweets = await Tweet.find({ author: user._id }).sort({ createdAt: -1 }).populate('author').populate('comments');
     res.json(tweets);
 }
 
+
+
+// SAVE tweet for user function
+export const getSavedTweets = async (req, res) => {
+    const { username } = req.params;
+    // Find the user by username
+    const user = await User.findOne({ username }).populate({
+        path: 'saves', // Populate the 'saves' array
+        model: 'Tweet', // Populate with the 'Tweet' model
+        populate: { path: 'author', select: 'username' } // Also populate the author field in the tweets
+    });
+
+    // Check if the user exists
+    if (!user) {
+        return res.status(404).json({ message: 'Sorry, this user does not exist' });
+    }
+
+    // Return the populated saves array
+    res.status(200).json({ savedTweets: user.saves });
+
+
+}
+
+
+
+
+// SAVE tweet for user function
+export const saveTweet = async (req, res) => {
+    const { tweetId } = req.params;
+
+    // Validate the tweetId format
+    if (!mongoose.Types.ObjectId.isValid(tweetId)) {
+        return res.status(400).json({ message: "Sorry, this post doesn't exist." });
+    }
+
+    const user = await User.findById(req.user._id); // use findById
+
+    if (!user) {
+        return res.status(404).json({ message: 'Sorry, this user does not exist' });
+    }
+
+    // Check if the 'saves' array exists; if not, initialize it
+    if (!user.saves) {
+        user.saves = []; // Initialize if undefined
+    }
+
+    // Add tweetId to the user's saves if it's not already saved
+    if (!user.saves.includes(tweetId)) {
+        user.saves.push(tweetId); // Add the tweet to saves
+        await user.save(); // Save changes to the database
+
+        return res.status(200).json({ message: "Tweet added to saves", user });
+    } else {
+        return res.status(400).json({ message: "Tweet is already saved" });
+    }
+}
+
+
+
+
 // GET a specific tweet by ID
 export const getTweet = async (req, res) => {
-    const foundTweet = await Tweet.findById(req.params.tweetId).populate({
+    const id = req.params.tweetId;
+
+    // Validate the tweetId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Sorry, this post doesn't exist." });
+    }
+
+    const foundTweet = await Tweet.findById(id).populate({
         path: 'comments',
         options: { sort: { createdAt: -1 } }, // Sort comments by createdAt in descending order
         populate: {
             path: 'author'
         }
     })
-    .populate('author');
+        .populate('author');
+    // If tweet is not found, return 404 status with an error message
+    if (!foundTweet) {
+        return res.status(404).json({ message: "Sorry, this post doesn't exist." });
+    }
     res.json({ foundTweet });
 }
+
+
+
+
 
 //Get all comments for a specific tweet
 export const getAllComments = async (req, res) => {
