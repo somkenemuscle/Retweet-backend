@@ -20,7 +20,14 @@ export const getUserTweets = async (req, res) => {
 
 // GET a specific tweet by ID
 export const getTweet = async (req, res) => {
-    const foundTweet = await Tweet.findById(req.params.tweetId).populate('author').populate('comments');
+    const foundTweet = await Tweet.findById(req.params.tweetId).populate({
+        path: 'comments',
+        options: { sort: { createdAt: -1 } }, // Sort comments by createdAt in descending order
+        populate: {
+            path: 'author'
+        }
+    })
+    .populate('author');
     res.json({ foundTweet });
 }
 
