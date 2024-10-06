@@ -25,8 +25,12 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Tweet',
         required: true
-    }]
-});
+    }],
+    verification: {
+        type: Boolean,
+        default: false
+    }
+}, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);
 

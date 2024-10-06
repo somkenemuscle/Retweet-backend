@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 // GET all tweets
 export const getAllTweets = async (req, res) => {
     // Fetch tweets and sort by createdAt field in descending order (newest first)
-    const tweets = await Tweet.find().sort({ createdAt: -1 }).populate('author').populate('comments');
+    const tweets = await Tweet.find().sort({ createdAt: -1 }).populate('author').populate('comments').populate('likes');
     res.json(tweets);
 }
 
@@ -43,8 +43,6 @@ export const getSavedTweets = async (req, res) => {
 
     // Return the populated saves array
     res.status(200).json({ savedTweets: user.saves });
-
-
 }
 
 
@@ -54,34 +52,76 @@ export const getSavedTweets = async (req, res) => {
 export const saveTweet = async (req, res) => {
     const { tweetId } = req.params;
 
-    // Validate the tweetId format
-    if (!mongoose.Types.ObjectId.isValid(tweetId)) {
+    // Validate the tweetId format using isValidObjectId
+    if (!mongoose.isValidObjectId(tweetId)) {
         return res.status(400).json({ message: "Sorry, this post doesn't exist." });
     }
 
-    const user = await User.findById(req.user._id); // use findById
+    const user = await User.findById(req.user._id); // Use findById to get the user
 
     if (!user) {
         return res.status(404).json({ message: 'Sorry, this user does not exist' });
     }
 
-    // Check if the 'saves' array exists; if not, initialize it
+    // Ensure the 'saves' array exists
     if (!user.saves) {
         user.saves = []; // Initialize if undefined
     }
 
-    // Add tweetId to the user's saves if it's not already saved
-    if (!user.saves.includes(tweetId)) {
-        user.saves.push(tweetId); // Add the tweet to saves
+    // Convert tweetId to ObjectId (no need to use 'new')
+    const tweetObjectId = mongoose.Types.ObjectId.createFromHexString(tweetId);
+
+    // Check if tweetId is already in user's saves
+    const isAlreadySaved = user.saves.some((savedTweetId) => savedTweetId.equals(tweetObjectId));
+
+    if (isAlreadySaved) {
+        // Unsave the tweet (remove it from the saves array)
+        user.saves = user.saves.filter((savedTweetId) => !savedTweetId.equals(tweetObjectId));
+        await user.save(); // Save changes to the database
+
+        return res.status(200).json({ message: "Tweet removed from saves", user });
+    } else {
+        // Save the tweet (add to the saves array)
+        user.saves.push(tweetObjectId);
         await user.save(); // Save changes to the database
 
         return res.status(200).json({ message: "Tweet added to saves", user });
-    } else {
-        return res.status(400).json({ message: "Tweet is already saved" });
     }
-}
+};
 
 
+//like tweet
+export const likeTweet = async (req, res) => {
+    const { tweetId } = req.params;
+    const userId = req.user._id; // userId from token (ObjectId)
+
+    // Validate tweetId and userId format using isValidObjectId
+    if (!mongoose.isValidObjectId(tweetId) || !mongoose.isValidObjectId(userId)) {
+        return res.status(400).json({ message: "Invalid tweet or user ID." });
+    }
+
+
+    const tweet = await Tweet.findById(tweetId); // Find the tweet by ID
+
+    if (!tweet) {
+        return res.status(404).json({ message: 'Post not found' }); // Return if tweet doesn't exist
+    }
+
+    // Check if userId exists in tweet.likes (array of ObjectIds)
+    const hasLiked = tweet.likes.some((like) => like.equals(userId));
+
+    if (hasLiked) {
+        // Unlike the post
+        tweet.likes = tweet.likes.filter((like) => !like.equals(userId));
+        await tweet.save();
+        return res.status(200).json({ likes: tweet.likes.length });
+    } else {
+        // Like the post
+        tweet.likes.push(userId);
+        await tweet.save();
+        return res.status(200).json({ likes: tweet.likes.length });
+    }
+};
 
 
 // GET a specific tweet by ID

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllTweets, getTweet, createTweet, getUserTweets, deleteComment, deleteTweet, createComment, getAllComments, saveTweet, getSavedTweets } from '../controllers/tweet.controller.js';
+import { getAllTweets, getTweet, createTweet, getUserTweets, deleteComment, deleteTweet, createComment, getAllComments, saveTweet, getSavedTweets, likeTweet } from '../controllers/tweet.controller.js';
 import isLoggedin from '../utils/isLoggedin.js';
 import handleAsyncErr from '../utils/catchAsync.js';
 const router = express.Router();
@@ -23,9 +23,11 @@ router.post("/", isLoggedin, handleAsyncErr(createTweet));
 // Save a tweet for a user
 router.post("/:tweetId/save", isLoggedin, handleAsyncErr(saveTweet));
 
+//like tweet route
+router.post("/:tweetId/like", isLoggedin, handleAsyncErr(likeTweet));
+
 // // Get saves for user
 router.get('/:username/saves', handleAsyncErr(getSavedTweets));
-
 
 //Create a comment
 router.post("/:tweetId/comments", isLoggedin, handleAsyncErr(createComment));
