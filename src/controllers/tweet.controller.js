@@ -20,7 +20,7 @@ export const getUserTweets = async (req, res) => {
         return res.status(404).json({ message: 'Sorry, this user does not exist' });
     }
     // Find all tweets by a particular user by their username
-    const tweets = await Tweet.find({ author: user._id }).sort({ createdAt: -1 }).populate('author').populate('comments');
+    const tweets = await Tweet.find({ author: user._id }).sort({ createdAt: -1 }).populate('author').populate('comments').populate('likes');
     res.json(tweets);
 }
 
@@ -31,9 +31,19 @@ export const getSavedTweets = async (req, res) => {
     const { username } = req.params;
     // Find the user by username
     const user = await User.findOne({ username }).populate({
-        path: 'saves', // Populate the 'saves' array
+        path: 'saves', // Populate the 'saves' array (which contains tweets)
         model: 'Tweet', // Populate with the 'Tweet' model
-        populate: { path: 'author', select: 'username' } // Also populate the author field in the tweets
+        populate: [
+            {
+                path: 'author', // Populate the author of each saved tweet
+                select: 'username'
+            },
+            {
+                path: 'likes', // Populate the 'likes' array within each saved tweet
+                model: 'User', // Assuming likes store references to User model
+                select: 'username' // Populate with the username of the users who liked
+            }
+        ]
     });
 
     // Check if the user exists
@@ -140,7 +150,7 @@ export const getTweet = async (req, res) => {
             path: 'author'
         }
     })
-        .populate('author');
+        .populate('author').populate('likes');
     // If tweet is not found, return 404 status with an error message
     if (!foundTweet) {
         return res.status(404).json({ message: "Sorry, this post doesn't exist." });
