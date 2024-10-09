@@ -218,7 +218,7 @@ export const deleteTweet = async (req, res) => {
         return res.status(403).json({ message: "Unauthorized: You don't have permission to delete this tweet" });
     }
     await Tweet.findByIdAndDelete(req.params.tweetId);
-    return res.status(200).json({ message: "Tweet Deleted " });
+    return res.status(200).json({ message: "Tweet Deleted" });
 }
 
 // Delete a specific comment by ID in campground and comment model

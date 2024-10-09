@@ -13,7 +13,7 @@ const commentSchema = new Schema({
         ref: 'User',
         required: true
     }
-});
+}, { timestamps: true });
 
 export const Comment = mongoose.model('Comment', commentSchema);
 
