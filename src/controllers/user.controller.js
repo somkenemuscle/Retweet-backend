@@ -117,6 +117,21 @@ export const logOutUser = async (req, res) => {
 }
 
 
+//find a user by username
+export const findUser = async (req, res) => {
+    const { username } = req.params;
+    const users = await User.find({ username: { $regex: `^${username}`, $options: 'i' } });
+
+    if (users.length > 0) {
+        const usernames = users.map(user => user.username);
+        res.status(200).json({ usernames });
+    } else {
+        res.status(404).json({ message: 'No users found' });
+    }
+}
+
+
+
 //Refresh token controller function
 export const refreshToken = (req, res) => {
 
